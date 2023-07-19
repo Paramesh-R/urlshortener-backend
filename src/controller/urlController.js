@@ -13,7 +13,7 @@ exports.createNewShortUrl = async (req, res, next) => {
     try {
         // console.log("createNewShortUrl \n" + JSON.stringify(req.body))   //TEST
         const { originalLink } = req.body;
-        console.log(req)
+        console.log(req.body)
         const user_id = await jwt.verify(req.cookies.token, process.env.JWT_SECRET).id
         console.log(user_id);
         let urlData = await Url.findOne({ originalLink, 'createdBy': user_id });

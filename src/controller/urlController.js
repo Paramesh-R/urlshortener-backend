@@ -181,7 +181,7 @@ exports.deleteShortUrl = async (req, res, next) => {
         } else {
             const skip = (pageCount - 1) * ITEMS_PER_PAGE
         }
-
+        console.log('filtering:', user_id, ITEMS_PER_PAGE, skip)
         const items = await Url
             .find({ 'createdBy': user_id })
             .sort({ createdAt: -1 })
@@ -193,6 +193,7 @@ exports.deleteShortUrl = async (req, res, next) => {
             .send({ page, items, count, pageCount })
 
     } catch (error) {
+        console.log(error)
         res.status(500).send({ message: "Error deleteShortUrl" })
     }
 

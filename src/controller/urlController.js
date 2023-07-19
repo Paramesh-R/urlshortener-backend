@@ -151,14 +151,17 @@ exports.updateShortUrl = async (req, res, next) => {
 
 // DELETE SHORT URL => DELETE: /api/url/:id
 exports.deleteShortUrl = async (req, res, next) => {
+    console.log("Called Delete short url endpoint")
     const page = req.query.page || 1;
-    console.log(page)
+    console.log(req.query.page)
+    console.log("Page", page)
     try {
         const short_url_Exists = await Url.findById(req.params.id);
-
+        console.log('short urls exists', short_url_Exists)
         if (!short_url_Exists) return res.status(404).send({ message: "Short Url not found with id" + req.params.id });
 
-        await Url.findByIdAndRemove(req.params.id);
+        const removed_data = await Url.findByIdAndRemove(req.params.id);
+        console.log(removed_data);
 
         // return res.status(200).send({ message: "Short Url Deleted Successfully", data: short_url_Exists })
 
@@ -166,11 +169,11 @@ exports.deleteShortUrl = async (req, res, next) => {
 
         // const user_id = await jwt.verify(req.cookies.token, process.env.JWT_SECRET).id || ""; // req.cookies.token is not working in Render
         const user_id = await jwt.verify(req.get('token'), process.env.JWT_SECRET).id || ""
-        console.log(user_id);
+        console.log("USer Id:", user_id);
         /* jwt.verify(req.cookies.token, process.env.JWT_SECRET).id */
 
         const count = await Url.count({ 'createdBy': user_id })
-        console.log(await Url.count({ 'createdBy': user_id }))
+        console.log("Count of Urls:", await Url.count({ 'createdBy': user_id }))
         const pageCount = Math.ceil(count / ITEMS_PER_PAGE) || 1;
 
         if (page <= pageCount) {
@@ -185,7 +188,7 @@ exports.deleteShortUrl = async (req, res, next) => {
             .limit(ITEMS_PER_PAGE)
             .skip(skip)
 
-        // console.log({ page, items, count, pageCount })
+        console.log({ page, items, count, pageCount })
         res.status(200)
             .send({ page, items, count, pageCount })
 

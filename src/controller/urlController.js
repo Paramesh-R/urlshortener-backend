@@ -152,8 +152,8 @@ exports.updateShortUrl = async (req, res, next) => {
 // DELETE SHORT URL => DELETE: /api/url/:id
 exports.deleteShortUrl = async (req, res, next) => {
     console.log("Called Delete short url endpoint")
-    const page = req.query.page || 1;
-    console.log(req.query.page)
+    const page = req.get('page') || 1;
+    console.log(req.get('token'))
     console.log("Page", page)
     try {
         const short_url_Exists = await Url.findById(req.params.id);
@@ -175,11 +175,12 @@ exports.deleteShortUrl = async (req, res, next) => {
         const count = await Url.count({ 'createdBy': user_id })
         console.log("Count of Urls:", await Url.count({ 'createdBy': user_id }))
         const pageCount = Math.ceil(count / ITEMS_PER_PAGE) || 1;
-
+        console.log('pageCount', pageCount)
+        let skip = 0;
         if (page <= pageCount) {
-            const skip = (page - 1) * ITEMS_PER_PAGE
+            skip = (page - 1) * ITEMS_PER_PAGE
         } else {
-            const skip = (pageCount - 1) * ITEMS_PER_PAGE
+            skip = (pageCount - 1) * ITEMS_PER_PAGE
         }
         console.log('filtering:', user_id, ITEMS_PER_PAGE, skip)
         const items = await Url

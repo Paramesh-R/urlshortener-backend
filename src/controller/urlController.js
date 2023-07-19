@@ -152,7 +152,7 @@ exports.updateShortUrl = async (req, res, next) => {
 // DELETE SHORT URL => DELETE: /api/url/:id
 exports.deleteShortUrl = async (req, res, next) => {
     console.log("Called Delete short url endpoint")
-    const page = req.get('page') || 1;
+    let page = req.get('page') || 1;
     console.log(req.get('page'))
     console.log("Page", page)
     try {

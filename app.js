@@ -12,6 +12,7 @@ const cors = require('cors');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/userRoute');
 const authRouter = require('./routes/authRoute');
+const urlRouter = require('./routes/urlRoute');
 
 
 var app = express();
@@ -44,7 +45,7 @@ connectDatabase();
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/auth', authRouter);
-// app.use('/api/url', urlRouter);
+app.use('/api/url', urlRouter);
 
 
 

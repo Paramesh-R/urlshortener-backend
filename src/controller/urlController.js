@@ -13,9 +13,8 @@ exports.createNewShortUrl = async (req, res, next) => {
     try {
         // console.log("createNewShortUrl \n" + JSON.stringify(req.body))   //TEST
         const { originalLink } = req.body;
-        console.log(req.get('token'))
-        // const user_id = await jwt.verify(req.cookies.token, process.env.JWT_SECRET).id
-        const user_id = await jwt.verify(req.body.token, process.env.JWT_SECRET).id
+        // const user_id = await jwt.verify(req.cookies.token, process.env.JWT_SECRET).id// This method is not getting cookies in render
+        const user_id = await jwt.verify(req.get('token'), process.env.JWT_SECRET).id
         console.log(user_id);
         let urlData = await Url.findOne({ originalLink, 'createdBy': user_id });
         console.log(urlData);
@@ -67,7 +66,8 @@ exports.showShortUrlsOfUser = async (req, res, next) => {
     console.log(page)
     try {
 
-        const user_id = await jwt.verify(req.cookies.token, process.env.JWT_SECRET).id || "";
+        // const user_id = await jwt.verify(req.cookies.token, process.env.JWT_SECRET).id || ""; // req.cookies.token is not working in Render
+        const user_id = await jwt.verify(req.get('token'), process.env.JWT_SECRET).id || ""
         console.log(user_id);
         /* jwt.verify(req.cookies.token, process.env.JWT_SECRET).id */
         const skip = (page - 1) * ITEMS_PER_PAGE  //Page 2: (1*5 =>5)

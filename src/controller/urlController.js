@@ -151,12 +151,17 @@ exports.updateShortUrl = async (req, res, next) => {
 
 // DELETE SHORT URL => DELETE: /api/url/:id
 exports.deleteShortUrl = async (req, res, next) => {
+    console.log("Called Delete short url endpoint")
     const page = req.get('page') || 1;
+    console.log(req.get('page'))
+    console.log("Page", page)
     try {
         const short_url_Exists = await Url.findById(req.params.id);
+        console.log('short urls exists', short_url_Exists)
         if (!short_url_Exists) return res.status(404).send({ message: "Short Url not found with id" + req.params.id });
 
         const removed_data = await Url.findByIdAndRemove(req.params.id);
+        console.log(removed_data);
 
         // return res.status(200).send({ message: "Short Url Deleted Successfully", data: short_url_Exists })
 
@@ -164,22 +169,27 @@ exports.deleteShortUrl = async (req, res, next) => {
 
         // const user_id = await jwt.verify(req.cookies.token, process.env.JWT_SECRET).id || ""; // req.cookies.token is not working in Render
         const user_id = await jwt.verify(req.get('token'), process.env.JWT_SECRET).id || ""
+        console.log("USer Id:", user_id);
         /* jwt.verify(req.cookies.token, process.env.JWT_SECRET).id */
 
         const count = await Url.count({ 'createdBy': user_id })
+        console.log("Count of Urls:", await Url.count({ 'createdBy': user_id }))
         const pageCount = Math.ceil(count / ITEMS_PER_PAGE) || 1;
-
+        console.log('pageCount', pageCount)
+        
         if (page > pageCount) {
-            page = pageCount
+            page = pageCount 
         }
-        let skip = skip = (page - 1) * ITEMS_PER_PAGE
-
+        let skip = (page - 1) * ITEMS_PER_PAGE
+        
+        console.log('filtering:', user_id, ITEMS_PER_PAGE, skip)
         const items = await Url
             .find({ 'createdBy': user_id })
             .sort({ createdAt: -1 })
             .limit(ITEMS_PER_PAGE)
             .skip(skip)
 
+        console.log({ page, count, pageCount })
         res.status(200)
             .send({ page, items, count, pageCount })
 

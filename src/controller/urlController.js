@@ -63,7 +63,7 @@ exports.createNewShortUrl = async (req, res, next) => {
 exports.showShortUrlsOfUser = async (req, res, next) => {
     const page = req.query.page || 1;
 
-    console.log(page)
+    console.log("Show result: Pg ", page)
     try {
 
         // const user_id = await jwt.verify(req.cookies.token, process.env.JWT_SECRET).id || ""; // req.cookies.token is not working in Render
@@ -151,17 +151,50 @@ exports.updateShortUrl = async (req, res, next) => {
 
 // DELETE SHORT URL => DELETE: /api/url/:id
 exports.deleteShortUrl = async (req, res, next) => {
+    const page = req.query.page || 1;
+    console.log(page)
     try {
         const short_url_Exists = await Url.findById(req.params.id);
 
         if (!short_url_Exists) return res.status(404).send({ message: "Short Url not found with id" + req.params.id });
 
         await Url.findByIdAndRemove(req.params.id);
-        return res.status(200).send({ message: "Short Url Deleted Successfully", data: short_url_Exists })
+
+        // return res.status(200).send({ message: "Short Url Deleted Successfully", data: short_url_Exists })
+
+        // Update for Render delay
+
+        // const user_id = await jwt.verify(req.cookies.token, process.env.JWT_SECRET).id || ""; // req.cookies.token is not working in Render
+        const user_id = await jwt.verify(req.get('token'), process.env.JWT_SECRET).id || ""
+        console.log(user_id);
+        /* jwt.verify(req.cookies.token, process.env.JWT_SECRET).id */
+
+        const count = await Url.count({ 'createdBy': user_id })
+        console.log(await Url.count({ 'createdBy': user_id }))
+        const pageCount = Math.ceil(count / ITEMS_PER_PAGE) || 1;
+
+        if (page <= pageCount) {
+            const skip = (page - 1) * ITEMS_PER_PAGE
+        } else {
+            const skip = (pageCount - 1) * ITEMS_PER_PAGE
+        }
+
+        const items = await Url
+            .find({ 'createdBy': user_id })
+            .sort({ createdAt: -1 })
+            .limit(ITEMS_PER_PAGE)
+            .skip(skip)
+
+        // console.log({ page, items, count, pageCount })
+        res.status(200)
+            .send({ page, items, count, pageCount })
 
     } catch (error) {
         res.status(500).send({ message: "Error deleteShortUrl" })
     }
+
+
+
 }
 
 

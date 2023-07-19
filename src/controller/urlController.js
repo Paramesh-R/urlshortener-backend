@@ -153,7 +153,7 @@ exports.updateShortUrl = async (req, res, next) => {
 exports.deleteShortUrl = async (req, res, next) => {
     console.log("Called Delete short url endpoint")
     const page = req.get('page') || 1;
-    console.log(req.get('token'))
+    console.log(req.get('page'))
     console.log("Page", page)
     try {
         const short_url_Exists = await Url.findById(req.params.id);
